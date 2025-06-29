@@ -1,8 +1,7 @@
 # Instrucciones
 
-¡Perfecto! Te voy a mostrar cómo usar el Matrix Universal Docker en tu Raspberry Pi desde Windows PowerShell. Es muy fácil usando SSH.
 
-## 🎯 **Configuración completa paso a paso:**
+## **Configuración completa paso a paso:**
 
 
 #### **Instalar Docker en Linux:**
