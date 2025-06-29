@@ -37,7 +37,7 @@ git clone https://github.com/pablety/matrix-universal-docker.git
 cd matrix-universal-docker
 ```
 
-### **3. Configurar para Raspberry Pi**
+### **3. Configurar para Linux**
 
 #### **Detectar IP:**
 ```bash
@@ -51,16 +51,16 @@ hostname -I
 # Editar archivo .env
 nano .env
 
-# Configurar IP de la Raspberry Pi
+# Configurar IP del server
 SERVER_NAME=192.168.1.100
 POSTGRES_PASSWORD=raspberry_matrix_2025
 ENABLE_REGISTRATION=true
 ```
 
-### **4. Instalar Matrix en Raspberry Pi**
+### **4. Instalar Matrix **
 
 ```bash
-# Desde SSH en la Raspberry Pi
+
 # Hacer ejecutable el script
 chmod +x build-and-run.sh
 
@@ -71,7 +71,7 @@ chmod +x build-and-run.sh
 ### **5. Crear primer usuario**
 
 ```bash
-# Desde SSH en la Raspberry Pi
+
 ./scripts/create-user.sh
 
 # Seguir instrucciones:
