@@ -32,6 +32,20 @@ DB_MAX_CONNECTIONS=${DB_MAX_CONNECTIONS:-10}
 CACHE_FACTOR=${CACHE_FACTOR:-1.5}
 
 log "Configuración detectada:"
+# Procesar templates de configuración
+log "⚙️  Procesando templates de configuración..."
+
+# Variables para templates
+export MACAROON_SECRET_KEY=${MACAROON_SECRET_KEY:-$(openssl rand -hex 32)}
+export FORM_SECRET=${FORM_SECRET:-$(openssl rand -hex 32)}
+
+# Generar configuración Nginx desde template
+envsubst < /opt/configs/nginx.conf.template > /etc/nginx/sites-available/matrix
+
+# Generar configuración Element desde template  
+envsubst < /opt/configs/element-config.json.template > /var/www/element/config.json
+
+log_success "Templates procesados"
 log "  Server Name: $SERVER_NAME"
 log "  Registration: $ENABLE_REGISTRATION"
 log "  Federation: $ENABLE_FEDERATION"
