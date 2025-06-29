@@ -46,7 +46,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/*
-
+# Añadir después de las otras instalaciones
+RUN apt-get update && apt-get install -y gettext-base
 # Crear usuario matrix
 RUN groupadd -r matrix \
     && useradd -r -g matrix -d $MATRIX_HOME -s /bin/bash matrix \
