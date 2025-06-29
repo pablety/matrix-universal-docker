@@ -1,0 +1,90 @@
+{
+    "default_server_config": {
+        "m.homeserver": {
+            "base_url": "https://${SERVER_NAME}",
+            "server_name": "${SERVER_NAME}"
+        },
+        "m.identity_server": {
+            "base_url": ""
+        }
+    },
+    "brand": "Matrix Universal Docker",
+    "integrations_ui_url": "",
+    "integrations_rest_url": "",
+    "integrations_widgets_urls": [],
+    "bug_report_endpoint_url": "",
+    "uisi_autorageshake_app": "",
+    "default_country_code": "ES",
+    "show_labs_settings": true,
+    "features": {
+        "feature_spaces": true,
+        "feature_spaces.all_rooms": true,
+        "feature_spaces.space_member_dms": true,
+        "feature_dnd": true,
+        "feature_custom_status": true,
+        "feature_custom_tags": true,
+        "feature_state_counters": true,
+        "feature_many_integration_managers": true,
+        "feature_mjolnir": true,
+        "feature_dm_verification": true,
+        "feature_bridge_state": true,
+        "feature_presence_in_room_list": true,
+        "feature_custom_themes": true,
+        "feature_pinning": true,
+        "feature_thread": true,
+        "feature_location_share": true,
+        "feature_voice_messages": true,
+        "feature_sliding_sync": false,
+        "feature_element_call_video_rooms": true,
+        "feature_group_calls": true,
+        "feature_call_transfer": true,
+        "feature_audio_calls": true,
+        "feature_video_calls": true
+    },
+    "default_federate": ${ENABLE_FEDERATION:-false},
+    "default_theme": "light",
+    "room_directory": {
+        "servers": [
+            "${SERVER_NAME}"
+        ]
+    },
+    "enable_presence_by_hs_url": {
+        "https://${SERVER_NAME}": false
+    },
+    "setting_defaults": {
+        "breadcrumbs": true,
+        "UIFeature.urlPreviews": true,
+        "UIFeature.feedback": false,
+        "UIFeature.voip": true,
+        "UIFeature.widgets": true,
+        "UIFeature.flair": true,
+        "UIFeature.communities": false,
+        "UIFeature.advanced": true,
+        "UIFeature.shareQrCode": true,
+        "UIFeature.shareSocial": true
+    },
+    "jitsi": {
+        "preferred_domain": ""
+    },
+    "element_call": {
+        "url": "",
+        "participant_limit": 8,
+        "brand": "Element Call"
+    },
+    "map_style_url": "",
+    "sentry": {
+        "dsn": "",
+        "environment": ""
+    },
+    "posthog": {
+        "project_api_key": "",
+        "api_host": ""
+    },
+    "privacy_policy_url": "",
+    "terms_and_conditions_url": "",
+    "help_url": "",
+    "help_encrypt_url": "",
+    "welcome_user_id": "",
+    "mobile_guide_toast": false,
+    "mobile_builds_available": true
+}

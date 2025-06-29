@@ -1,0 +1,153 @@
+# Matrix Synapse Configuration Template
+# Variables are replaced during container startup
+
+server_name: "${SERVER_NAME}"
+pid_file: /opt/matrix/homeserver.pid
+web_client_location: https://${SERVER_NAME}/
+
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    resources:
+      - names: [client, federation]
+        compress: false
+
+# Database Configuration
+database:
+  name: psycopg2
+  args:
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    database: ${POSTGRES_DB}
+    host: localhost
+    port: 5432
+    cp_min: 5
+    cp_max: ${DB_MAX_CONNECTIONS:-10}
+    keepalives_idle: 10
+    keepalives_interval: 10
+    keepalives_count: 3
+
+# Logging
+log_config: "/opt/matrix/homeserver.log.config"
+
+# Media storage
+media_store_path: /opt/matrix/data/media_store
+max_upload_size: "${MAX_UPLOAD_SIZE:-50}M"
+max_image_pixels: "32M"
+dynamic_thumbnails: true
+
+# Security keys (generated during startup)
+macaroon_secret_key: "${MACAROON_SECRET_KEY}"
+registration_shared_secret: "${MATRIX_REGISTRATION_SHARED_SECRET}"
+form_secret: "${FORM_SECRET}"
+signing_key_path: "/opt/matrix/homeserver.signing.key"
+
+# Registration
+enable_registration: ${ENABLE_REGISTRATION:-true}
+enable_registration_without_verification: ${ENABLE_REGISTRATION:-true}
+registrations_require_3pid: []
+allowed_local_3pids: []
+enable_3pid_lookup: false
+
+# Federation
+federation_domain_whitelist: []
+federation_verify_certificates: ${ENABLE_FEDERATION:-false}
+allow_guest_access: false
+
+# Performance
+presence:
+  enabled: false
+
+caches:
+  global_factor: ${CACHE_FACTOR:-1.5}
+
+# Security
+password_config:
+  enabled: true
+  policy:
+    minimum_length: 8
+    require_digit: true
+    require_symbol: false
+    require_lowercase: true
+    require_uppercase: false
+
+# Features
+enable_metrics: false
+enable_media_repo: true
+url_preview_enabled: true
+url_preview_ip_range_blacklist:
+  - '127.0.0.0/8'
+  - '10.0.0.0/8'
+  - '172.16.0.0/12'
+  - '192.168.0.0/16'
+  - '100.64.0.0/10'
+  - '169.254.0.0/16'
+  - '::1/128'
+  - 'fe80::/64'
+  - 'fc00::/7'
+
+# Retention
+retention:
+  enabled: false
+
+# Push notifications
+push:
+  enabled: true
+  include_content: true
+
+# Trusted key servers for room key sharing
+trusted_key_servers:
+  - server_name: "matrix.org"
+
+# Report stats
+report_stats: ${REPORT_STATS:-false}
+
+# Additional modules (can be extended)
+modules: []
+
+# App service configuration
+app_service_config_files: []
+
+# Email configuration (disabled by default)
+email:
+  smtp_host: ""
+  smtp_port: 587
+  smtp_user: ""
+  smtp_pass: ""
+  force_tls: false
+  notif_from: "Matrix <noreply@${SERVER_NAME}>"
+  app_name: "Matrix Universal Docker"
+  notif_for_new_users: false
+  
+# Rate limiting
+rc_message:
+  per_second: 10
+  burst_count: 50
+
+rc_registration:
+  per_second: 0.5
+  burst_count: 5
+
+rc_login:
+  address:
+    per_second: 0.17
+    burst_count: 3
+  account:
+    per_second: 0.17
+    burst_count: 3
+  failed_attempts:
+    per_second: 0.17
+    burst_count: 3
+
+# Auto-join rooms (none by default)
+auto_join_rooms: []
+
+# Default room settings
+default_room_version: "9"
+
+# Experimental features
+experimental_features:
+  spaces_enabled: true
+  msc3026_enabled: true
