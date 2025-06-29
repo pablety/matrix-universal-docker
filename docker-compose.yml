@@ -1,0 +1,100 @@
+# Matrix Universal Docker Compose
+# Ejecuta: docker-compose up -d
+# Accede: https://localhost o https://tu-ip
+
+version: '3.8'
+
+services:
+  matrix-universal:
+    build: .
+    container_name: matrix-universal
+    hostname: matrix-server
+    restart: unless-stopped
+    
+    # Puertos expuestos
+    ports:
+      - "80:80"       # HTTP
+      - "443:443"     # HTTPS
+      - "8008:8008"   # Matrix API (opcional)
+    
+    # Variables de entorno (personalizar en .env)
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-localhost}
+      - ENABLE_REGISTRATION=${ENABLE_REGISTRATION:-true}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-matrix_docker_2025}
+      - MATRIX_REGISTRATION_SHARED_SECRET=${MATRIX_REGISTRATION_SHARED_SECRET:-}
+      - REPORT_STATS=${REPORT_STATS:-no}
+      - ENABLE_FEDERATION=${ENABLE_FEDERATION:-false}
+    
+    # Volúmenes para persistencia de datos
+    volumes:
+      # Datos de Matrix (mensajes, usuarios, configuración)
+      - matrix_data:/opt/matrix/data
+      # Base de datos PostgreSQL
+      - postgres_data:/var/lib/postgresql
+      # Certificados SSL
+      - ssl_certs:/etc/ssl/matrix
+      # Logs del sistema
+      - matrix_logs:/var/log
+      # Configuración personalizada (opcional)
+      - ./custom-config:/opt/custom-config:ro
+    
+    # Configuración de red
+    networks:
+      - matrix_network
+    
+    # Recursos del sistema (opcional)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    
+    # Configuración de salud
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/_matrix/client/versions"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# Volúmenes nombrados para persistencia
+volumes:
+  matrix_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH:-./data}/matrix
+  
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH:-./data}/postgres
+  
+  ssl_certs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH:-./data}/ssl
+  
+  matrix_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH:-./data}/logs
+
+# Red interna para Matrix
+networks:
+  matrix_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
