@@ -1,23 +1,94 @@
-# Matrix Universal Docker 🚀
+# Instrucciones
 
-**Servidor Matrix completo que funciona en cualquier equipo con Docker**
+¡Perfecto! Te voy a mostrar cómo usar el Matrix Universal Docker en tu Raspberry Pi desde Windows PowerShell. Es muy fácil usando SSH.
 
-[![Docker](https://img.shields.io/badge/Docker-Compatible-blue.svg)](https://www.docker.com/)
-[![Matrix](https://img.shields.io/badge/Matrix-Synapse-green.svg)](https://matrix.org/)
-[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue.svg)](https://www.postgresql.org/)
-[![Element](https://img.shields.io/badge/Client-Element-lightgreen.svg)](https://element.io/)
+## 🎯 **Configuración completa paso a paso:**
 
-## 🎯 Características
 
-- ✅ **Funciona en cualquier equipo** con Docker
-- ✅ **Instalación en 5 minutos**
-- ✅ **Datos persistentes** automáticamente
-- ✅ **HTTPS incluido** con certificados SSL
-- ✅ **PostgreSQL integrado** para máximo rendimiento
-- ✅ **Element Web** incluido para acceso inmediato
-- ✅ **Backup automático** de todos los datos
-- ✅ **Configuración sencilla** con variables de entorno
+#### **Instalar Docker en Linux:**
+```bash
 
+# Actualizar sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instalar Docker
+curl -fsSL https://get.docker.com | sh
+
+# Agregar usuario pi al grupo docker
+sudo usermod -aG docker pi
+
+# Instalar Docker Compose
+sudo apt install -y docker-compose
+
+# Aplicar cambios de grupo
+newgrp docker
+
+# Verificar instalación
+docker --version
+docker-compose --version
+```
+
+### **2. Transferir el proyecto Linux**
+
+#### Clonar directamente en Servidor**
+```bash
+# Desde SSH en la Raspberry Pi
+cd /home/pi
+git clone https://github.com/pablety/matrix-universal-docker.git
+cd matrix-universal-docker
+```
+
+### **3. Configurar para Raspberry Pi**
+
+#### **Detectar IP:**
+```bash
+# Desde SSH en Linux
+hostname -I
+# Ejemplo: 192.168.1.100
+```
+
+#### **Configurar variables de entorno:**
+```bash
+# Editar archivo .env
+nano .env
+
+# Configurar IP de la Raspberry Pi
+SERVER_NAME=192.168.1.100
+POSTGRES_PASSWORD=raspberry_matrix_2025
+ENABLE_REGISTRATION=true
+```
+
+### **4. Instalar Matrix en Raspberry Pi**
+
+```bash
+# Desde SSH en la Raspberry Pi
+# Hacer ejecutable el script
+chmod +x build-and-run.sh
+
+# Ejecutar instalación
+./build-and-run.sh
+```
+
+### **5. Crear primer usuario**
+
+```bash
+# Desde SSH en la Raspberry Pi
+./scripts/create-user.sh
+
+# Seguir instrucciones:
+# Username: pablety
+# Password: tu_password_segura
+# Admin: y
+```
+
+
+### **Desde otros dispositivos en la red:**
+- **PC**: `https://192.168.1.100`
+- **Móvil**: `https://192.168.1.100`
+- **Tablet**: `https://192.168.1.100`
+
+
+# Informacion General
 ## 🚀 Instalación rápida
 
 ```bash
@@ -313,38 +384,226 @@ docker-compose build --no-cache matrix-universal
 docker-compose up -d
 ```
 
-## 📞 Soporte
 
-### Documentación adicional
 
-- 📖 [Guía de instalación detallada](./docs/INSTALL.md)
-- 📖 [Manual de uso](./docs/USAGE.md)
-- 📖 [Solución de problemas](./docs/TROUBLESHOOTING.md)
 
-### Recursos útiles
 
-- [Matrix.org](https://matrix.org/) - Documentación oficial
-- [Element.io](https://element.io/) - Cliente oficial
-- [Docker Hub](https://hub.docker.com/) - Imágenes Docker
 
-## 📝 Changelog
+# Aparte
 
-### v1.0 (2025-06-29)
-- ✅ Versión inicial
-- ✅ PostgreSQL integrado
-- ✅ Element Web incluido
-- ✅ HTTPS automático
-- ✅ Scripts de utilidad
-- ✅ Backup automático
+## 🔧 **Script PowerShell para gestión remota**
 
-## 📄 Licencia
+Crea este script en Windows para gestionar tu Matrix desde PowerShell:
 
-MIT License - Libre para uso personal y comercial
+```powershell name=matrix-remote-manager.ps1
+# Matrix Universal Docker - Gestor Remoto
+# Usar desde Windows PowerShell para gestionar Raspberry Pi
 
-## 👨‍💻 Autor
+param(
+    [string]$RaspberryIP = "192.168.1.100",
+    [string]$Username = "pi",
+    [string]$Action = "status"
+)
 
-Creado por **pablety** - 2025-06-29
+# Colores para PowerShell
+function Write-ColorOutput($ForegroundColor) {
+    $fc = $host.UI.RawUI.ForegroundColor
+    $host.UI.RawUI.ForegroundColor = $ForegroundColor
+    if ($args) {
+        Write-Output $args
+    }
+    $host.UI.RawUI.ForegroundColor = $fc
+}
 
----
+function Write-Info { Write-ColorOutput Cyan $args }
+function Write-Success { Write-ColorOutput Green $args }
+function Write-Warning { Write-ColorOutput Yellow $args }
+function Write-Error { Write-ColorOutput Red $args }
 
-**🎉 ¡Disfruta tu servidor Matrix Universal!**
+Write-Info "🚀 Matrix Universal Docker - Gestor Remoto"
+Write-Info "============================================="
+Write-Info "Raspberry Pi: $RaspberryIP"
+Write-Info "Usuario: $Username"
+Write-Info "Acción: $Action"
+Write-Info ""
+
+# Función para ejecutar comandos remotos
+function Invoke-SSHCommand {
+    param($Command)
+    
+    Write-Info "Ejecutando: $Command"
+    ssh $Username@$RaspberryIP "cd matrix-universal-docker && $Command"
+}
+
+# Acciones disponibles
+switch ($Action) {
+    "status" {
+        Write-Info "📋 Verificando estado de Matrix..."
+        Invoke-SSHCommand "docker-compose ps"
+    }
+    
+    "start" {
+        Write-Info "🚀 Iniciando Matrix..."
+        Invoke-SSHCommand "docker-compose up -d"
+        Write-Success "✅ Matrix iniciado"
+    }
+    
+    "stop" {
+        Write-Info "🛑 Deteniendo Matrix..."
+        Invoke-SSHCommand "docker-compose down"
+        Write-Success "✅ Matrix detenido"
+    }
+    
+    "restart" {
+        Write-Info "🔄 Reiniciando Matrix..."
+        Invoke-SSHCommand "docker-compose restart"
+        Write-Success "✅ Matrix reiniciado"
+    }
+    
+    "logs" {
+        Write-Info "📝 Mostrando logs..."
+        Invoke-SSHCommand "docker-compose logs --tail=20"
+    }
+    
+    "create-user" {
+        Write-Info "👤 Creando usuario..."
+        $NewUsername = Read-Host "Nombre de usuario"
+        $NewPassword = Read-Host "Contraseña" -AsSecureString
+        $PlainPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($NewPassword))
+        $IsAdmin = Read-Host "¿Es administrador? (y/N)"
+        
+        $AdminFlag = if ($IsAdmin -eq "y") { "y" } else { "n" }
+        Invoke-SSHCommand "./scripts/create-user.sh $NewUsername $PlainPassword $AdminFlag"
+    }
+    
+    "backup" {
+        Write-Info "💾 Creando backup..."
+        Invoke-SSHCommand "./scripts/backup.sh"
+        Write-Success "✅ Backup creado"
+    }
+    
+    "update" {
+        Write-Info "🔄 Actualizando Matrix..."
+        Invoke-SSHCommand "docker-compose pull && docker-compose build --no-cache && docker-compose up -d"
+        Write-Success "✅ Matrix actualizado"
+    }
+    
+    "info" {
+        Write-Info "ℹ️ Información del servidor..."
+        Invoke-SSHCommand "docker exec matrix-universal supervisorctl status"
+        Write-Info ""
+        Write-Info "🌐 Acceder desde Windows:"
+        Write-Success "   https://$RaspberryIP"
+        Write-Info "👤 Crear usuario:"
+        Write-Success "   .\matrix-remote-manager.ps1 -Action create-user"
+    }
+    
+    "connect" {
+        Write-Info "🔗 Conectando por SSH..."
+        ssh $Username@$RaspberryIP
+    }
+    
+    "install" {
+        Write-Info "📦 Instalando Matrix en Raspberry Pi..."
+        Write-Warning "Esto puede tomar varios minutos..."
+        Invoke-SSHCommand "./build-and-run.sh"
+        Write-Success "✅ Instalación completada"
+        Write-Info "🌐 Acceder: https://$RaspberryIP"
+    }
+    
+    default {
+        Write-Info "📋 Acciones disponibles:"
+        Write-Info "  status      - Ver estado de servicios"
+        Write-Info "  start       - Iniciar Matrix"
+        Write-Info "  stop        - Detener Matrix" 
+        Write-Info "  restart     - Reiniciar Matrix"
+        Write-Info "  logs        - Ver logs"
+        Write-Info "  create-user - Crear nuevo usuario"
+        Write-Info "  backup      - Crear backup"
+        Write-Info "  update      - Actualizar Matrix"
+        Write-Info "  info        - Información del servidor"
+        Write-Info "  connect     - Conectar por SSH"
+        Write-Info "  install     - Instalar Matrix"
+        Write-Info ""
+        Write-Info "💡 Ejemplo de uso:"
+        Write-Success "   .\matrix-remote-manager.ps1 -RaspberryIP 192.168.1.100 -Action status"
+    }
+}
+```
+
+## 🎯 **Uso del script PowerShell**
+
+### **Guardar el script:**
+```powershell
+# Crear archivo en Windows
+New-Item -Path "C:\Users\pablety\matrix-remote-manager.ps1" -ItemType File
+# Copiar el contenido del script de arriba
+```
+
+### **Usar el script:**
+```powershell
+# Cambiar a directorio del script
+cd C:\Users\pablety
+
+# Ver estado de Matrix
+.\matrix-remote-manager.ps1 -RaspberryIP 192.168.1.100 -Action status
+
+# Crear usuario
+.\matrix-remote-manager.ps1 -RaspberryIP 192.168.1.100 -Action create-user
+
+# Ver logs
+.\matrix-remote-manager.ps1 -RaspberryIP 192.168.1.100 -Action logs
+
+# Crear backup
+.\matrix-remote-manager.ps1 -RaspberryIP 192.168.1.100 -Action backup
+
+# Conectar por SSH
+.\matrix-remote-manager.ps1 -RaspberryIP 192.168.1.100 -Action connect
+```
+
+## 🔧 **Comandos útiles desde Windows PowerShell**
+
+### **Conectar y gestionar:**
+```powershell
+# Conectar por SSH
+ssh pi@192.168.1.100
+
+# Transferir archivos
+scp archivo.txt pi@192.168.1.100:/home/pi/
+
+# Ejecutar comando remoto
+ssh pi@192.168.1.100 "docker-compose ps"
+
+# Túnel SSH para acceso local (opcional)
+ssh -L 8080:localhost:80 pi@192.168.1.100
+# Acceder: http://localhost:8080
+```
+
+### **Monitoreo remoto:**
+```powershell
+# Ver logs en tiempo real
+ssh pi@192.168.1.100 "cd matrix-universal-docker && docker-compose logs -f"
+
+# Ver estado de servicios
+ssh pi@192.168.1.100 "cd matrix-universal-docker && docker-compose ps"
+
+# Ver recursos del sistema
+ssh pi@192.168.1.100 "htop"
+```
+
+## 🌐 **Configuración de red (opcional)**
+
+### **Configurar IP estática en Raspberry Pi:**
+```bash
+# Desde SSH en Raspberry Pi
+sudo nano /etc/dhcpcd.conf
+
+# Agregar al final:
+interface eth0
+static ip_address=192.168.1.100/24
+static routers=192.168.1.1
+static domain_name_servers=8.8.8.8 8.8.4.4
+
+# Reiniciar
+sudo reboot
+```
